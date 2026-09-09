@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: #050505;
+  color: #F2F2F4;
+  font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  scrollbar-color: #262629 transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262629; border-radius: 4px; }
+
+:focus-visible {
+  outline: 2px solid #00E5FF;
+  outline-offset: 2px;
+}
+
+.mono {
+  font-family: 'Fira Code', ui-monospace, SFMono-Regular, monospace;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.live-dot {
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.event-enter {
+  animation: slide-in 0.35s ease-out;
+}
+
+@keyframes enter-row-anim {
+  from { opacity: 0; transform: translateY(-4px); background-color: rgba(0,229,255,0.10); }
+  to { opacity: 1; transform: translateY(0); background-color: transparent; }
+}
+.enter-row {
+  animation: enter-row-anim 900ms ease-out;
+}
+
+/* Signal bar visualization: gentle height transition when data refreshes */
+.signal-bar {
+  transition: height 500ms ease, opacity 500ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot, .event-enter, .enter-row, .signal-bar {
+    animation: none !important;
+    transition: none !important;
+  }
+}
