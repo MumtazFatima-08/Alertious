@@ -357,3 +357,15 @@ Guide Human Review
 ```
 
 That separation makes each stage testable and gives a reviewer a concrete path from an input event to the final incident decision.
+
+---
+
+## Author
+
+**Mumtaz Fatima**  
+AI Engineering & Cybersecurity
+
+- GitHub: [MumtazFatima-08](https://github.com/MumtazFatima-08)
+- LinkedIn: [Mumtaz Fatima](https://www.linkedin.com/in/mumtaz-fatima-112366325/)
+
+Built as a portfolio engineering project focused on security monitoring, explainable detection logic, and backend system design.
