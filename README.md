@@ -2,7 +2,15 @@
 
 **From alerts to incidents.**
 
-Alertious is a portfolio-grade security alert correlation and incident investigation prototype. It demonstrates event normalization, entity- and time-based correlation, deterministic incident reconstruction, explainable risk scoring, and contextual response guidance — all built on transparent, rule-based backend logic, not a language model.
+> A deterministic security alert correlation and incident investigation workspace that turns related events into explainable incidents.
+
+[![Stack](https://img.shields.io/badge/Stack-React%20%2B%20FastAPI-111827)](https://github.com/MumtazFatima-08/Alertious)
+[![Tests](https://img.shields.io/badge/Backend%20Tests-37-111827)](https://github.com/MumtazFatima-08/Alertious)
+[![Status](https://img.shields.io/badge/Status-Portfolio%20Prototype-111827)](https://github.com/MumtazFatima-08/Alertious)
+
+Alertious is a portfolio-grade security alert correlation and incident investigation prototype. It demonstrates event normalization, entity- and time-based correlation, deterministic incident reconstruction, explainable risk scoring, and contextual response guidance — all built on transparent, rule-based backend logic rather than a language model.
+
+**Core idea:** individual alerts are often low-signal; the sequence and relationship between them can reveal a security incident. Alertious makes those relationships explicit, auditable, and visible to an analyst.
 
 ## 🖥️ Interface Preview
 
@@ -24,6 +32,10 @@ Alertious is a portfolio-grade security alert correlation and incident investiga
 
 ---
 
+## Quick navigation
+
+[Problem](#1-problem) · [Architecture](#3-architecture) · [Correlation](#5-correlation-engine) · [Risk Scoring](#7-risk-scoring) · [Simulator](#9-simulator) · [API](#12-api) · [Testing](#13-testing) · [Local Setup](#14-running-it-locally) · [Limitations](#15-limitations)
+
 ## 1. Problem
 
 Security tooling generates a large volume of individual alerts. Most, in isolation, are low-signal: a single failed login, a new device, a file open. The security-relevant story usually isn't any one alert — it's the *sequence*:
@@ -37,7 +49,17 @@ Individually, none of these alerts justifies analyst attention. Together, they d
 
 ## 2. Why Alertious
 
-Most portfolio security projects either (a) render a static dashboard over fake numbers, or (b) wrap an LLM prompt and call the output "detection." Alertious is built around a different bet: that the interesting engineering problem in this space is the correlation and explainability layer, and that it should be fully deterministic so every decision can be audited. If a reviewer asks "why did the system decide these seven events were one incident?", the answer should be a list of named rules and their weights — never "the model said so."
+The project focuses on the correlation and explainability layer rather than treating a dashboard or an LLM response as the detection mechanism. Every correlation decision is backed by named rules, weights, matching entities, and timestamps.
+
+If a reviewer asks **"why did the system decide these events belong together?"**, the investigation view can trace the decision back to concrete evidence instead of an opaque model output.
+
+### What makes the prototype technically interesting
+
+- **Deterministic correlation:** related events are connected using explicit entity, time, and sequence rules.
+- **Explainable incidents:** correlation evidence and risk factors are retained and exposed through the API.
+- **Real backend pipeline:** simulator events use the same ingestion path as API-generated events.
+- **Editable detection logic:** correlation rules and weights are stored in the database and can be changed from the UI.
+- **Human-in-the-loop response:** the system provides review guidance but does not perform destructive actions.
 
 ## 3. Architecture
 
@@ -71,6 +93,8 @@ Response Guidance ── deterministic, event-type + context-aware review /
 Every stage is a plain Python function or class in `backend/app/services/`, independently unit-tested. The frontend never computes or hardcodes any of this — it only renders what the API returns.
 
 ## 4. Event schema
+
+The normalized event model is the common contract between ingestion, correlation, incident reconstruction, scoring, and the frontend.
 
 ```json
 {
@@ -142,6 +166,28 @@ Alertious never recommends or performs automatic destructive actions (disabling 
 
 `backend/app/services/simulator.py` generates six synthetic scenarios (`credential_stuffing`, `account_takeover`, `privilege_escalation`, `insider_activity`, `data_exfiltration`, `normal_activity`). Every event the simulator produces is pushed through the exact same normalize → persist → correlate → build-incident pipeline as any other event — there is no separate "demo mode" logic and no frontend-only animation faking the effect.
 
+### Example investigation flow
+
+A representative account-takeover sequence can look like:
+
+```
+FAILED LOGIN
+    ↓
+FAILED LOGIN
+    ↓
+SUCCESSFUL LOGIN
+    ↓
+NEW DEVICE
+    ↓
+PRIVILEGE CHANGE
+    ↓
+SENSITIVE FILE ACCESS
+    ↓
+INCIDENT + EVIDENCE + RISK FACTORS + GUIDANCE
+```
+
+The important part is not the synthetic scenario itself; it is that the same backend mechanisms responsible for processing API events produce the resulting incident and evidence.
+
 ## 10. Tech stack
 
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS, lucide-react
@@ -198,6 +244,16 @@ frontend/
 
 37 backend tests cover normalization, correlation rules, risk scoring, response guidance, API behavior, simulator execution, and route-registration regressions.
 
+| Area | Coverage |
+|---|---|
+| Event normalization | Validation, defaults, timestamp handling |
+| Correlation | Entity matching, time window, sequence rules, thresholds |
+| Risk scoring | Additive factors, caps, multi-stage sequences |
+| Response guidance | Event-type and context-aware guidance |
+| API | Event, incident, rule, simulator, and stats routes |
+| Simulator | Scenario execution through the real pipeline |
+| Frontend | TypeScript compilation and production build |
+
 Run them with:
 
 ```bash
@@ -217,6 +273,14 @@ npm run build
 
 ## 14. Running it locally
 
+### Prerequisites
+
+- Python 3.x
+- Node.js and npm
+- A terminal with separate processes for backend and frontend
+
+### 1. Start the backend
+
 ```bash
 # backend
 cd backend
@@ -231,6 +295,20 @@ npm run dev
 
 The frontend dev server proxies `/api` to `localhost:8000`. On first backend startup the database is created and seeded with a realistic synthetic dataset.
 
+### 2. Open the application
+
+After both processes are running, open the Vite development URL shown in the frontend terminal and use the **Simulator** to generate a scenario. Then inspect the resulting incident from the **Incidents** or **Investigate** views.
+
+### 3. What to verify
+
+A successful local run should let you:
+
+1. Generate a synthetic security scenario.
+2. Watch events enter the backend pipeline.
+3. See correlated events grouped into an incident.
+4. Inspect the correlation evidence and risk factors.
+5. Change a correlation rule and observe its effect on subsequent events.
+
 ## 15. Limitations
 
 - The correlation engine only considers events sharing an explicit entity (user, IP, device, or destination).
@@ -241,13 +319,41 @@ The frontend dev server proxies `/api` to `localhost:8000`. On first backend sta
 
 ## 16. Future improvements
 
-- Pluggable correlation rules
+- Learned / graph-based correlation for relationships not captured by explicit entities
 - Per-user behavioral baselining
 - Background job runner for the simulator
 - Multi-incident merge/split tooling
 - Role-based access control and audit logging
 - Postgres support for realistic ingestion volume
+- Authentication, authorization, and analyst audit trails
+- Production-oriented ingestion queues and background workers
 
 ## 17. Visual design notes
 
 The UI uses a deep-black, multi-accent security-console identity: near-black surfaces, white/off-white typography, cyan for live/system status, electric blue for correlation, violet for analysis, and magenta/orange/yellow for severity. The signal visualizations are based on event data rather than decorative placeholders.
+
+---
+
+## Engineering takeaway
+
+Alertious is intentionally **not** presented as a production SIEM, EDR, or autonomous incident-response platform. Its value as an engineering project is the traceable backend pipeline:
+
+```
+Raw Event
+   ↓
+Normalize
+   ↓
+Persist
+   ↓
+Correlate
+   ↓
+Reconstruct Incident
+   ↓
+Score Risk
+   ↓
+Explain Evidence
+   ↓
+Guide Human Review
+```
+
+That separation makes each stage testable and gives a reviewer a concrete path from an input event to the final incident decision.
