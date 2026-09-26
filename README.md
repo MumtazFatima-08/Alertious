@@ -1,34 +1,39 @@
 # Alertious
 
-**From alerts to incidents.**
-
-> A deterministic security alert correlation and incident investigation workspace that turns related events into explainable incidents.
+**Deterministic security alert correlation and incident investigation platform** that turns related events into explainable incidents, risk scores, and actionable response guidance.
 
 [![Stack](https://img.shields.io/badge/Stack-React%20%2B%20FastAPI-111827)](https://github.com/MumtazFatima-08/Alertious)
+[![Detection](https://img.shields.io/badge/Detection-Rule--Based%2C%20No%20LLM-111827)](https://github.com/MumtazFatima-08/Alertious)
 [![Tests](https://img.shields.io/badge/Backend%20Tests-37-111827)](https://github.com/MumtazFatima-08/Alertious)
 [![Status](https://img.shields.io/badge/Status-Portfolio%20Prototype-111827)](https://github.com/MumtazFatima-08/Alertious)
 
-Alertious is a portfolio-grade security alert correlation and incident investigation prototype. It demonstrates event normalization, entity- and time-based correlation, deterministic incident reconstruction, explainable risk scoring, and contextual response guidance — all built on transparent, rule-based backend logic rather than a language model.
+Alertious correlates related security events using explicit entity-, time-, and sequence-based rules; reconstructs them into incidents; scores each incident with a fully additive, explainable 0–100 risk model; and returns response guidance for a human analyst to review. Detection and scoring run entirely on transparent, rule-based backend logic — there is no LLM or opaque ML model in the decision path. The stack is a React/TypeScript frontend backed by a FastAPI service.
 
-**Core idea:** individual alerts are often low-signal; the sequence and relationship between them can reveal a security incident. Alertious makes those relationships explicit, auditable, and visible to an analyst.
+Alertious is a portfolio engineering prototype built to demonstrate correlation and explainability design, not a production SIEM or EDR — see [Limitations](#15-limitations) for what that scope leaves out.
+
+**Core idea:** individual alerts are often low-signal; the sequence and relationship between them can reveal a security incident. Alertious makes those relationships explicit, auditable, and visible to an analyst — every correlation decision, risk-score factor, and guidance recommendation can be traced back to the specific rule and evidence that produced it.
 
 ## 🖥️ Interface Preview
 
 ### Overview
+Correlation rate, active incident count, high-priority alerts, and a live event-severity timeline in one view.
 
-![Alertious Overview](docs/screenshots/overview.svg)
+![Alertious Overview](docs/screenshots/overview.png)
 
 ### Incidents
+Correlated alert groups awaiting review, each with computed severity, risk score, and status.
 
-![Alertious Incidents](docs/screenshots/incidents.svg)
+![Alertious Incidents](docs/screenshots/incidents.png)
 
 ### Investigation
+Pick an incident to open its full timeline, correlation evidence, risk factors, and response guidance.
 
-![Alertious Investigation](docs/screenshots/investigate.svg)
+![Alertious Investigation](docs/screenshots/investigate.png)
 
 ### Correlation Rules
+Live-editable rule weights, grouped by entity, temporal, and sequence correlation — changes apply immediately, no restart required.
 
-![Alertious Rules](docs/screenshots/rules.svg)
+![Alertious Rules](docs/screenshots/rules.png)
 
 ---
 
